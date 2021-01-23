@@ -1,4 +1,5 @@
 export enum Message
 {
-	PlayerSelection
+	PlayerSelection,
+	PlayerIndex
 }

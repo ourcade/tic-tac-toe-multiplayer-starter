@@ -10,6 +10,12 @@ export default class Server
 	private events: Phaser.Events.EventEmitter
 
 	private room?: Room<ITicTacToeState & Schema>
+	private _playerIndex = -1
+
+	get playerIndex()
+	{
+		return this._playerIndex
+	}
 
 	constructor()
 	{
@@ -20,6 +26,11 @@ export default class Server
 	async join()
 	{
 		this.room = await this.client.joinOrCreate<ITicTacToeState & Schema>('tic-tac-toe')
+
+		this.room.onMessage(Message.PlayerIndex, (message: { playerIndex: number }) => {
+			console.log(message.playerIndex)
+			this._playerIndex = message.playerIndex
+		})
 
 		this.room.onStateChange.once(state => {
 			this.events.emit('once-state-changed', state)
@@ -35,6 +46,10 @@ export default class Server
 					case 'board':
 						this.events.emit('board-changed', value)
 						break
+					
+					case 'activePlayer':
+						this.events.emit('player-turn-changed', value)
+						break
 				}
 			})
 		}
@@ -44,6 +59,12 @@ export default class Server
 	{
 		if (!this.room)
 		{
+			return
+		}
+
+		if (this.playerIndex !== this.room.state.activePlayer)
+		{
+			console.warn('not this player\'s turn')
 			return
 		}
 
@@ -58,5 +79,10 @@ export default class Server
 	onBoardChanged(cb: (board: number[]) => void, context?: any)
 	{
 		this.events.on('board-changed', cb, context)
+	}
+
+	onPlayerTurnChanged(cb: (playerIndex: number) => void, context?: any)
+	{
+		this.events.on('player-turn-changed', cb, context)
 	}
 }

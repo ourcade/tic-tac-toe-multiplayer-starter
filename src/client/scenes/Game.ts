@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import ITicTacToeState, { Cell } from '~/types/ITicTacToeState'
+import ITicTacToeState, { Cell } from '../../types/ITicTacToeState'
 import type Server from '../services/Server'
 
 export default class Game extends Phaser.Scene
@@ -42,6 +42,22 @@ export default class Game extends Phaser.Scene
 					this.server?.makeSelection(idx)
 				})
 
+			switch (cellState)
+			{
+				case Cell.X:
+				{
+					this.add.star(cell.x, cell.y, 4, 4, 60, 0xff0000)
+						.setAngle(45)
+					break
+				}
+
+				case Cell.O:
+				{
+					this.add.circle(cell.x, cell.y, 50, 0x0000ff)
+					break
+				}
+			}
+
 			this.cells.push({
 				display: cell,
 				value: cellState 
@@ -57,6 +73,7 @@ export default class Game extends Phaser.Scene
 		})
 
 		this.server?.onBoardChanged(this.handleBoardChanged, this)
+		this.server?.onPlayerTurnChanged(this.handlePlayerTurnChanged, this)
 	}
 
 	private handleBoardChanged(board: Cell[])
@@ -64,13 +81,32 @@ export default class Game extends Phaser.Scene
 		for (let i = 0; i < board.length; ++i)
 		{
 			const cell = this.cells[i]
-			if (cell.value !== board[i])
+			const newValue = board[i]
+			if (cell.value !== newValue)
 			{
-				console.log('add x')
-				this.add.star(cell.display.x, cell.display.y, 4, 4, 60, 0xff0000)
-					.setAngle(45)
-				cell.value = board[i]
+				switch (newValue)
+				{
+					case Cell.X:
+					{
+						this.add.star(cell.display.x, cell.display.y, 4, 4, 60, 0xff0000)
+							.setAngle(45)
+						break
+					}
+
+					case Cell.O:
+					{
+						this.add.circle(cell.display.x, cell.display.y, 50, 0x0000ff)
+						break
+					}
+				}
+
+				cell.value = newValue
 			}
 		}
+	}
+
+	private handlePlayerTurnChanged(playerIndex: number)
+	{
+		
 	}
 }
