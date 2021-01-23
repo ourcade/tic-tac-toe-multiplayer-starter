@@ -1,0 +1,4 @@
+export enum Message
+{
+	PlayerSelection
+}
