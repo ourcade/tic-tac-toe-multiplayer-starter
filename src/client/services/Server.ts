@@ -1,7 +1,7 @@
 import { Client, Room } from 'colyseus.js'
 import { Schema } from '@colyseus/schema'
 import Phaser from 'phaser'
-import ITicTacToeState from '~/types/ITicTacToeState'
+import ITicTacToeState, { GameState } from '../../types/ITicTacToeState'
 import { Message } from '../../types/messages'
 
 export default class Server
@@ -15,6 +15,16 @@ export default class Server
 	get playerIndex()
 	{
 		return this._playerIndex
+	}
+
+	get gameState()
+	{
+		if (!this.room)
+		{
+			return GameState.WaitingForPlayers
+		}
+
+		return this.room?.state.gameState
 	}
 
 	constructor()
@@ -50,14 +60,33 @@ export default class Server
 					case 'activePlayer':
 						this.events.emit('player-turn-changed', value)
 						break
+
+					case 'winningPlayer':
+						this.events.emit('player-win', value)
+						break
+
+					case 'gameState':
+						this.events.emit('game-state-changed', value)
+						break
 				}
 			})
 		}
 	}
 
+	leave()
+	{
+		this.room?.leave()
+		this.events.removeAllListeners()
+	}
+
 	makeSelection(idx: number)
 	{
 		if (!this.room)
+		{
+			return
+		}
+
+		if (this.room.state.gameState !== GameState.Playing)
 		{
 			return
 		}
@@ -84,5 +113,15 @@ export default class Server
 	onPlayerTurnChanged(cb: (playerIndex: number) => void, context?: any)
 	{
 		this.events.on('player-turn-changed', cb, context)
+	}
+
+	onPlayerWon(cb: (playerIndex: number) => void, context?: any)
+	{
+		this.events.on('player-win', cb, context)
+	}
+
+	onGameStateChanged(cb: (state: GameState) => void, context?: any)
+	{
+		this.events.on('game-state-changed', cb, context)
 	}
 }

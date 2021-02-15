@@ -1,10 +1,15 @@
 import Phaser from 'phaser'
-import ITicTacToeState, { Cell } from '../../types/ITicTacToeState'
+import { IGameOverSceneData, IGameSceneData } from '../../types/scenes'
+import ITicTacToeState, { Cell, GameState } from '../../types/ITicTacToeState'
 import type Server from '../services/Server'
 
 export default class Game extends Phaser.Scene
 {
 	private server?: Server
+	private onGameOver?: (data: IGameOverSceneData) => void
+
+	private gameStateText?: Phaser.GameObjects.Text
+
 	private cells: { display: Phaser.GameObjects.Rectangle, value: Cell }[] = []
 
 	constructor()
@@ -12,11 +17,12 @@ export default class Game extends Phaser.Scene
 		super('game')
 	}
 
-	async create(data: { server: Server })
+	async create(data: IGameSceneData)
 	{
-		const { server } = data
+		const { server, onGameOver } = data
 
 		this.server = server
+		this.onGameOver = onGameOver
 
 		if (!this.server)
 		{
@@ -72,8 +78,17 @@ export default class Game extends Phaser.Scene
 			}
 		})
 
+		if (this.server?.gameState === GameState.WaitingForPlayers)
+		{
+			const width = this.scale.width
+			this.gameStateText = this.add.text(width * 0.5, 50, 'Waiting for opponent...')
+				.setOrigin(0.5)
+		}
+
 		this.server?.onBoardChanged(this.handleBoardChanged, this)
 		this.server?.onPlayerTurnChanged(this.handlePlayerTurnChanged, this)
+		this.server?.onPlayerWon(this.handlePlayerWon, this)
+		this.server?.onGameStateChanged(this.handleGameStateChanged, this)
 	}
 
 	private handleBoardChanged(board: Cell[])
@@ -107,6 +122,29 @@ export default class Game extends Phaser.Scene
 
 	private handlePlayerTurnChanged(playerIndex: number)
 	{
-		
+		// TODO: show a message letting the player know it is their turn
+	}
+
+	private handlePlayerWon(playerIndex: number)
+	{
+		this.time.delayedCall(1000, () => {
+			if (!this.onGameOver)
+			{
+				return
+			}
+
+			this.onGameOver({
+				winner: this.server?.playerIndex === playerIndex
+			})
+		})
+	}
+
+	private handleGameStateChanged(state: GameState)
+	{
+		if (state === GameState.Playing && this.gameStateText)
+		{
+			this.gameStateText.destroy()
+			this.gameStateText = undefined
+		}
 	}
 }

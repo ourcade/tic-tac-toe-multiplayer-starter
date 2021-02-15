@@ -3,7 +3,7 @@ import { Dispatcher } from '@colyseus/command'
 import { Message } from '../types/messages'
 import TicTacToeState from './TicTacToeState'
 import PlayerSelectionCommand from './commands/PlayerSelectionCommand'
-import NextTurnCommand from './commands/NextTurnCommand'
+import { GameState } from '../types/ITicTacToeState'
 
 export default class TicTacToe extends Room<TicTacToeState>
 {
@@ -11,6 +11,7 @@ export default class TicTacToe extends Room<TicTacToeState>
 
 	onCreate()
 	{
+		this.maxClients = 2
 		this.setState(new TicTacToeState())
 
 		this.onMessage(Message.PlayerSelection, (client, message: { index: number }) => {
@@ -27,5 +28,10 @@ export default class TicTacToe extends Room<TicTacToeState>
 		const idx = this.clients.findIndex(c => c.sessionId === client.sessionId)
 		console.log(idx)
 		client.send(Message.PlayerIndex, { playerIndex: idx })
+
+		if (this.clients.length >= 2)
+		{
+			this.state.gameState = GameState.Playing
+		}
 	}
 }
