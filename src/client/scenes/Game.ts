@@ -17,6 +17,11 @@ export default class Game extends Phaser.Scene
 		super('game')
 	}
 
+	init()
+	{
+		this.cells = []
+	}
+
 	async create(data: IGameSceneData)
 	{
 		const { server, onGameOver } = data
@@ -91,32 +96,28 @@ export default class Game extends Phaser.Scene
 		this.server?.onGameStateChanged(this.handleGameStateChanged, this)
 	}
 
-	private handleBoardChanged(board: Cell[])
+	private handleBoardChanged(newValue: Cell, idx: number)
 	{
-		for (let i = 0; i < board.length; ++i)
+		const cell = this.cells[idx]
+		if (cell.value !== newValue)
 		{
-			const cell = this.cells[i]
-			const newValue = board[i]
-			if (cell.value !== newValue)
+			switch (newValue)
 			{
-				switch (newValue)
+				case Cell.X:
 				{
-					case Cell.X:
-					{
-						this.add.star(cell.display.x, cell.display.y, 4, 4, 60, 0xff0000)
-							.setAngle(45)
-						break
-					}
-
-					case Cell.O:
-					{
-						this.add.circle(cell.display.x, cell.display.y, 50, 0x0000ff)
-						break
-					}
+					this.add.star(cell.display.x, cell.display.y, 4, 4, 60, 0xff0000)
+						.setAngle(45)
+					break
 				}
 
-				cell.value = newValue
+				case Cell.O:
+				{
+					this.add.circle(cell.display.x, cell.display.y, 50, 0x0000ff)
+					break
+				}
 			}
+
+			cell.value = newValue
 		}
 	}
 

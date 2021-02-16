@@ -29,13 +29,13 @@
 		"@types/express": "^4.17.1"
 	},
 	"dependencies": {
-		"phaser": "^3.50.1",
 		"@colyseus/command": "^0.1.6",
 		"@colyseus/monitor": "^0.12.2",
-		"colyseus": "^0.13.0",
-		"colyseus.js": "^0.13.2",
+		"colyseus": "^0.14.7",
+		"colyseus.js": "^0.14.1",
 		"cors": "^2.8.5",
 		"express": "^4.16.4",
+		"phaser": "^3.50.1",
 		"regenerator-runtime": "^0.13.7"
 	},
 	"parcelCleanPaths": [

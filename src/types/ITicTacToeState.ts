@@ -1,3 +1,5 @@
+import { Schema, ArraySchema } from '@colyseus/schema'
+
 export enum Cell
 {
 	Empty,
@@ -12,11 +14,11 @@ export enum GameState
 	Finished
 }
 
-export interface ITicTacToeState
+export interface ITicTacToeState extends Schema
 {
 	gameState: GameState
 	
-	board: Cell[]
+	board: ArraySchema<Cell>
 
 	activePlayer: number
 
