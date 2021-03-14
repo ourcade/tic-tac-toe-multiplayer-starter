@@ -15,6 +15,11 @@ Clone this repository with `git` and run:
 
 ```
 npm install
+
+# start the multiplayer server
+npm run start-server
+
+# in another terminal window to start the Phaser game
 npm run start
 ```
 
