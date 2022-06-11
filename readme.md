@@ -7,7 +7,7 @@
 
 This is a starter or template project for a basic multiplayer tic-tac-toe game using Colyseus as the multiplayer backend server and Phaser 3.50 as the frontend.
 
-[This code corresponds to a 7 part series on YouTube detailing how the template was made](https://www.youtube.com/playlist?list=PLumYWZ2t7CRueXsocQXOGqewmwzohljof).
+[This code corresponds to a 7 part series on YouTube detailing how the template was made](https://www.youtube.com/playlist?list=PLNwtXgWIx3rhOmsJOkUFRiFQg8pPFPDqy).
 
 ## Getting Started
 
